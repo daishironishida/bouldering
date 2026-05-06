@@ -42,12 +42,15 @@ dart run build_runner build --delete-conflicting-outputs
 ### 実行
 
 ```bash
-# Webブラウザ
-flutter run -d chrome --web-port 8080
-
 # iOSシミュレータ
 flutter run -d ios
 
 # Androidエミュレータ
 flutter run -d android
+
+# Web（サーバーのみ起動）
+flutter run -d web-server --web-port 8080
 ```
+
+Web の場合、`flutter run -d chrome` は Flutter が専用の一時プロフィールで Chrome を別インスタンスとして起動するため、
+`web-server` でサーバーのみ起動し、既存の Chrome で `http://localhost:8080` を開くことを推奨。
