@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/theme/app_theme.dart';
 import 'gym_list_provider.dart';
 
 class GymListScreen extends ConsumerWidget {
@@ -18,21 +19,82 @@ class GymListScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('エラー: $e')),
         data: (gyms) {
           if (gyms.isEmpty) {
-            return const Center(
-              child: Text('ジムを追加してください', style: TextStyle(color: Colors.grey)),
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.fitness_center,
+                      size: 48, color: Colors.white.withAlpha(30)),
+                  const SizedBox(height: 16),
+                  Text(
+                    'ジムを追加してください',
+                    style: TextStyle(color: Colors.white.withAlpha(80)),
+                  ),
+                ],
+              ),
             );
           }
           return ListView.separated(
+            padding: const EdgeInsets.all(16),
             itemCount: gyms.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final gym = gyms[index];
-              return ListTile(
-                title: Text(gym.name),
-                subtitle: Text('${gym.grades.length} グレード'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.push('/gym/${gym.id}'),
-                onLongPress: () => _showGymOptions(context, ref, gym.id, gym.name),
+              return Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => context.push('/gym/${gym.id}'),
+                  onLongPress: () =>
+                      _showGymOptions(context, ref, gym.id, gym.name),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                gym.name,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right,
+                                size: 18,
+                                color: Colors.white.withAlpha(60)),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${gym.grades.length} グレード',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withAlpha(80)),
+                        ),
+                        if (gym.grades.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          Row(
+                            children: gym.grades.map((g) {
+                              return Container(
+                                width: 12,
+                                height: 12,
+                                margin: const EdgeInsets.only(right: 5),
+                                decoration: BoxDecoration(
+                                  color: hexToColor(g.colorHex),
+                                  shape: BoxShape.circle,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
               );
             },
           );
@@ -88,6 +150,15 @@ class GymListScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(40),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('設定'),
@@ -121,10 +192,13 @@ class GymListScreen extends ConsumerWidget {
                   ),
                 );
                 if (confirmed == true) {
-                  await ref.read(gymListProvider.notifier).deleteGym(gymId);
+                  await ref
+                      .read(gymListProvider.notifier)
+                      .deleteGym(gymId);
                 }
               },
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
