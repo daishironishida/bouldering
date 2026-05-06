@@ -55,8 +55,9 @@ class _GridScreenState extends ConsumerState<GridScreen> {
         actions: [
           gymAsync.maybeWhen(
             data: (gym) => IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => context.push('/gym/${widget.gymId}/settings'),
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () =>
+                  context.push('/gym/${widget.gymId}/settings'),
             ),
             orElse: () => const SizedBox.shrink(),
           ),
@@ -71,9 +72,14 @@ class _GridScreenState extends ConsumerState<GridScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('グレードが設定されていません',
-                      style: TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 12),
+                  Icon(Icons.grid_view_rounded,
+                      size: 48, color: Colors.white.withAlpha(30)),
+                  const SizedBox(height: 16),
+                  Text(
+                    'グレードが設定されていません',
+                    style: TextStyle(color: Colors.white.withAlpha(80)),
+                  ),
+                  const SizedBox(height: 16),
                   FilledButton(
                     onPressed: () =>
                         context.push('/gym/${widget.gymId}/settings'),
@@ -101,96 +107,82 @@ class _GridScreenState extends ConsumerState<GridScreen> {
   }
 
   Widget _buildGrid(List<GradeConfig> grades, Map<String, Problem> problems) {
-    // 最大課題数を求めてヘッダー列数を決定（削除済み含む）
     final maxProblems = grades.fold(
         0, (max, g) => math.max(max, _effectiveColumnCount(g, problems)));
 
     return Column(
       children: [
-        // ─── 番号ヘッダー行（固定） ───────────────────────────────────────
-        Row(
-          children: [
-            // 左上コーナー
-            SizedBox(
-              width: kGradeColWidth,
-              height: kNumberRowHeight,
-              child: const ColoredBox(color: Color(0xFFF5F5F5)),
-            ),
-            // 番号ヘッダー（ボディと横スクロール同期）
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                controller: _headerScrollController,
-                physics: const NeverScrollableScrollPhysics(),
-                child: Row(
-                  children: List.generate(maxProblems, (i) {
-                    return SizedBox(
-                      width: kCellWidth,
-                      height: kNumberRowHeight,
-                      child: ColoredBox(
-                        color: const Color(0xFFF5F5F5),
+        // ─── 番号ヘッダー行（固定） ──────────────────────────────
+        Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 4),
+          child: Row(
+            children: [
+              SizedBox(width: kGradeColWidth + 12),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: _headerScrollController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Row(
+                    children: List.generate(maxProblems, (i) {
+                      return SizedBox(
+                        width: kCellWidth + kCellGap,
                         child: Center(
                           child: Text(
                             '${i + 1}',
-                            style: const TextStyle(
-                                fontSize: 11, color: Colors.grey),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withAlpha(80),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        const Divider(height: 1),
-        // ─── グリッド本体 ─────────────────────────────────────────────────
+        // ─── グリッド本体 ──────────────────────────────────────
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
+            padding: const EdgeInsets.only(bottom: 16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // グレード名（固定左列）
-                Column(
-                  children: grades.map((grade) {
-                    final color = hexToColor(grade.colorHex);
-                    return SizedBox(
-                      width: kGradeColWidth,
-                      height: kCellHeight,
-                      child: DecoratedBox(
+                // グレードピル（固定左列）
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    children: grades.map((grade) {
+                      final color = hexToColor(grade.colorHex);
+                      return Container(
+                        width: kGradeColWidth - 4,
+                        height: kCellHeight,
+                        margin: const EdgeInsets.only(bottom: kCellGap),
                         decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                                color: Colors.grey.shade300, width: 0.5),
-                            right:
-                                BorderSide(color: Colors.grey.shade400, width: 1),
+                          color: color,
+                          borderRadius: BorderRadius.circular(kCellRadius),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          grade.name,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.02,
                           ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 6,
-                              height: double.infinity,
-                              color: color,
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: Text(
-                                  grade.name,
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 // セル本体（横スクロール）
                 Expanded(
@@ -199,10 +191,14 @@ class _GridScreenState extends ConsumerState<GridScreen> {
                     controller: _bodyScrollController,
                     child: Column(
                       children: grades.map((grade) {
-                        return _GradeRow(
-                          gymId: widget.gymId,
-                          grade: grade,
-                          columnCount: _effectiveColumnCount(grade, problems),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: kCellGap),
+                          child: _GradeRow(
+                            gymId: widget.gymId,
+                            grade: grade,
+                            columnCount:
+                                _effectiveColumnCount(grade, problems),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -236,10 +232,13 @@ class _GradeRow extends ConsumerWidget {
       children: List.generate(columnCount, (i) {
         final number = i + 1;
         final problem = problems['${grade.id}_$number'];
-        return GridCell(
-          problem: problem,
-          gradeColorHex: grade.colorHex,
-          onTap: () => _openDetail(context, ref, number),
+        return Padding(
+          padding: const EdgeInsets.only(right: kCellGap),
+          child: GridCell(
+            problem: problem,
+            gradeColorHex: grade.colorHex,
+            onTap: () => _openDetail(context, ref, number),
+          ),
         );
       }),
     );

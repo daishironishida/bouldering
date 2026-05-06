@@ -29,30 +29,17 @@ class ProblemDetailSheet extends ConsumerWidget {
     final state = problem.cellState;
     final active = problem?.activeGeneration;
 
-    final titleRow = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Text(
-            '$gradeName  $number番',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const Spacer(),
-          _StatusChip(state: state),
-        ],
-      ),
-    );
-
     Widget buildContent(ScrollController scrollController) => Column(
           children: [
+            // ─── ドラッグハンドル (mobile) / 閉じるボタン (web) ──
             if (!kIsWeb)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Container(
-                  width: 40,
+                  width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: Colors.white.withAlpha(40),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -64,33 +51,60 @@ class ProblemDetailSheet extends ConsumerWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(Icons.close,
+                        color: Colors.white.withAlpha(160)),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
               ),
-            titleRow,
-            const Divider(height: 24),
+            // ─── タイトル ─────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text(
+                    '$gradeName  $number番',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Spacer(),
+                  _StatusChip(state: state),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Divider(height: 1, color: Colors.white.withAlpha(15)),
+            // ─── スクロール可能なコンテンツ ───────────────────────
             Expanded(
               child: ListView(
                 controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 children: [
                   if (active != null) ...[
-                    _LabelEditor(problemKey: _key, currentLabel: active.label),
-                    const SizedBox(height: 16),
+                    _LabelEditor(
+                        problemKey: _key, currentLabel: active.label),
+                    const SizedBox(height: 20),
                   ],
                   _ActionButtons(
                     problemKey: _key,
                     state: state,
                     onClose: () => Navigator.pop(context),
                   ),
-                  const SizedBox(height: 24),
                   if (problem != null && problem.generations.isNotEmpty) ...[
-                    const Text('クリア履歴',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 28),
+                    Text(
+                      'クリア履歴',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.1,
+                        color: Colors.white.withAlpha(100),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     _GenerationHistory(
                       problem: problem,
                       problemKey: _key,
@@ -123,18 +137,39 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, color) = switch (state) {
-      CellState.cleared => ('クリア済み', Colors.green),
-      CellState.uncleared => ('未クリア', Colors.orange),
-      CellState.deleted => ('削除済み', Colors.grey),
-      CellState.unregistered => ('未登録', Colors.grey),
+    final (label, bg, fg) = switch (state) {
+      CellState.cleared => (
+          'クリア済み',
+          const Color(0xFF4ADE80).withAlpha(30),
+          const Color(0xFF4ADE80),
+        ),
+      CellState.uncleared => (
+          '未クリア',
+          const Color(0xFFFB923C).withAlpha(30),
+          const Color(0xFFFB923C),
+        ),
+      CellState.deleted => (
+          '削除済み',
+          Colors.white.withAlpha(15),
+          Colors.white38,
+        ),
+      CellState.unregistered => (
+          '未登録',
+          Colors.white.withAlpha(15),
+          Colors.white38,
+        ),
     };
-    return Chip(
-      label: Text(label, style: const TextStyle(fontSize: 12)),
-      backgroundColor: color.withAlpha(30),
-      side: BorderSide(color: color.withAlpha(80)),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      visualDensity: VisualDensity.compact,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: fg.withAlpha(80)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg),
+      ),
     );
   }
 }
@@ -176,15 +211,14 @@ class _LabelEditorState extends ConsumerState<_LabelEditor> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.label_outline, size: 20, color: Colors.grey),
-        const SizedBox(width: 8),
+        Icon(Icons.label_outline, size: 18, color: Colors.white.withAlpha(80)),
+        const SizedBox(width: 10),
         Expanded(
           child: TextField(
             controller: _controller,
             decoration: const InputDecoration(
               hintText: 'ラベル（壁番号など）',
               isDense: true,
-              border: OutlineInputBorder(),
             ),
             onTap: () => setState(() => _editing = true),
             onSubmitted: (_) => _save(),
@@ -196,7 +230,8 @@ class _LabelEditorState extends ConsumerState<_LabelEditor> {
         if (_editing) ...[
           const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.check, color: Colors.green),
+            icon: const Icon(Icons.check_rounded,
+                color: Color(0xFF4ADE80), size: 20),
             onPressed: _save,
           ),
         ],
@@ -226,12 +261,10 @@ class _ActionButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier =
-        ref.read(problemDetailProvider(problemKey).notifier);
+    final notifier = ref.read(problemDetailProvider(problemKey).notifier);
 
     return Column(
       children: [
-        // クリアボタン（課題がある & 未クリア or 追加クリア）
         if (state == CellState.uncleared || state == CellState.cleared)
           SizedBox(
             width: double.infinity,
@@ -244,12 +277,11 @@ class _ActionButtons extends ConsumerWidget {
                   );
                 }
               },
-              icon: const Icon(Icons.check),
+              icon: const Icon(Icons.check_rounded, size: 18),
               label: const Text('クリア記録'),
             ),
           ),
         const SizedBox(height: 8),
-        // ホールド替え / 課題追加ボタン
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -282,16 +314,19 @@ class _ActionButtons extends ConsumerWidget {
                 );
               }
             },
-            icon: Icon(state == CellState.unregistered || state == CellState.deleted
-                ? Icons.add
-                : Icons.refresh),
+            icon: Icon(
+              state == CellState.unregistered || state == CellState.deleted
+                  ? Icons.add
+                  : Icons.refresh_rounded,
+              size: 18,
+            ),
             label: Text(
-                state == CellState.unregistered || state == CellState.deleted
-                    ? '課題を追加'
-                    : 'ホールド替え'),
+              state == CellState.unregistered || state == CellState.deleted
+                  ? '課題を追加'
+                  : 'ホールド替え',
+            ),
           ),
         ),
-        // 課題削除ボタン（課題ありの場合のみ）
         if (state == CellState.uncleared || state == CellState.cleared) ...[
           const SizedBox(height: 8),
           SizedBox(
@@ -321,9 +356,9 @@ class _ActionButtons extends ConsumerWidget {
               },
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.red,
-                side: const BorderSide(color: Colors.red),
+                side: BorderSide(color: Colors.red.withAlpha(80)),
               ),
-              icon: const Icon(Icons.delete_outline),
+              icon: const Icon(Icons.delete_outline, size: 18),
               label: const Text('課題を削除'),
             ),
           ),
@@ -342,7 +377,6 @@ class _GenerationHistory extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 新しい世代が先に来るよう逆順で表示
     final generations = problem.generations.reversed.toList();
 
     return Column(
@@ -378,14 +412,13 @@ class _GenerationSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 世代ヘッダー
         Row(
           children: [
             Text(
               '第 $generationNumber 世代',
               style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade600,
+                fontSize: 12,
+                color: Colors.white.withAlpha(100),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -395,25 +428,28 @@ class _GenerationSection extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: const Color(0xFF7C6AF5).withAlpha(40),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(
+                child: const Text(
                   '現在',
                   style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.blue.shade700,
-                      fontWeight: FontWeight.w600),
+                    fontSize: 10,
+                    color: Color(0xFF7C6AF5),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
           ],
         ),
+        const SizedBox(height: 6),
         if (generation.clearLogs.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             child: Text(
               'クリア記録なし',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+              style: TextStyle(
+                  fontSize: 13, color: Colors.white.withAlpha(60)),
             ),
           )
         else
@@ -421,7 +457,7 @@ class _GenerationSection extends ConsumerWidget {
                 log: log,
                 problemKey: problemKey,
               )),
-        const Divider(height: 20),
+        Divider(height: 20, color: Colors.white.withAlpha(15)),
       ],
     );
   }
@@ -437,20 +473,28 @@ class _ClearLogTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(problemDetailProvider(problemKey).notifier);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline, size: 16, color: Colors.green),
-          const SizedBox(width: 8),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: const BoxDecoration(
+              color: Color(0xFF4ADE80),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               _formatDate(log.clearedAt),
-              style: const TextStyle(fontSize: 13),
+              style:
+                  TextStyle(fontSize: 13, color: Colors.white.withAlpha(200)),
             ),
           ),
-          // 日時編集
           IconButton(
-            icon: const Icon(Icons.edit, size: 18),
+            icon: Icon(Icons.edit_outlined,
+                size: 16, color: Colors.white.withAlpha(80)),
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               final picked = await _pickDateTime(context, log.clearedAt);
@@ -459,9 +503,9 @@ class _ClearLogTile extends ConsumerWidget {
               }
             },
           ),
-          // 削除
           IconButton(
-            icon: const Icon(Icons.delete, size: 18, color: Colors.red),
+            icon: Icon(Icons.close_rounded,
+                size: 16, color: Colors.red.withAlpha(160)),
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               await notifier.deleteClearLog(log.id);
@@ -495,6 +539,7 @@ class _ClearLogTile extends ConsumerWidget {
     );
     if (time == null) return null;
 
-    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    return DateTime(
+        date.year, date.month, date.day, time.hour, time.minute);
   }
 }
