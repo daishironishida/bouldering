@@ -1,56 +1,56 @@
-# ボルダリング進捗管理アプリ
+# Bouldering Progress Tracker
 
-クライミングジムごとに課題のクリア状況を管理するFlutterアプリ。
-ローカルストレージのみで動作し、iOS・Android・Webブラウザに対応。
+A Flutter app for tracking problem completion status at climbing gyms.
+Works with local storage only, supporting iOS, Android, and web browsers.
 
-## 主な機能
+## Features
 
-- ジムの追加・削除
-- ジムごとにグレード（級）と課題数をカスタマイズ
-- グリッド表示で課題のクリア状況を一覧確認
-- クリア記録（日時）の追加・編集・削除
-- ホールド替え履歴の管理（世代管理）
+- Add and delete gyms
+- Customize grades and problem counts per gym
+- View completion status in a grid layout
+- Add, edit, and delete completion records (with timestamps)
+- Hold rotation history management (generation tracking)
 
-## 使用パッケージ
+## Packages
 
-| パッケージ | 用途 |
+| Package | Purpose |
 |---|---|
-| [flutter_riverpod](https://pub.dev/packages/flutter_riverpod) | 状態管理 |
-| [go_router](https://pub.dev/packages/go_router) | 画面遷移（URL ベース、Web 対応） |
-| [hive](https://pub.dev/packages/hive) / [hive_flutter](https://pub.dev/packages/hive_flutter) | ローカルストレージ（JSON 文字列として保存） |
-| [freezed_annotation](https://pub.dev/packages/freezed_annotation) / [freezed](https://pub.dev/packages/freezed) | イミュータブルなデータモデル生成 |
-| [json_annotation](https://pub.dev/packages/json_annotation) / [json_serializable](https://pub.dev/packages/json_serializable) | JSON シリアライズ生成 |
-| [uuid](https://pub.dev/packages/uuid) | ID 生成 |
-| [build_runner](https://pub.dev/packages/build_runner) | コード生成実行ツール |
+| [flutter_riverpod](https://pub.dev/packages/flutter_riverpod) | State management |
+| [go_router](https://pub.dev/packages/go_router) | Navigation (URL-based, web-compatible) |
+| [hive](https://pub.dev/packages/hive) / [hive_flutter](https://pub.dev/packages/hive_flutter) | Local storage (stored as JSON strings) |
+| [freezed_annotation](https://pub.dev/packages/freezed_annotation) / [freezed](https://pub.dev/packages/freezed) | Immutable data model generation |
+| [json_annotation](https://pub.dev/packages/json_annotation) / [json_serializable](https://pub.dev/packages/json_serializable) | JSON serialization generation |
+| [uuid](https://pub.dev/packages/uuid) | ID generation |
+| [build_runner](https://pub.dev/packages/build_runner) | Code generation runner |
 
-## 起動方法
+## Getting Started
 
-### 前提条件
+### Prerequisites
 
-- Flutter SDK 3.x 以上がインストール済みであること
+- Flutter SDK 3.x or later installed
 
-### セットアップ
+### Setup
 
 ```bash
-# 依存パッケージのインストール
+# Install dependencies
 flutter pub get
 
-# コード生成（初回・モデル変更時）
+# Code generation (first time or after model changes)
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### 実行
+### Running
 
 ```bash
-# iOSシミュレータ
+# iOS Simulator
 flutter run -d ios
 
-# Androidエミュレータ
+# Android Emulator
 flutter run -d android
 
-# Web（サーバーのみ起動）
+# Web (server only)
 flutter run -d web-server --web-port 8080
 ```
 
-Web の場合、`flutter run -d chrome` は Flutter が専用の一時プロフィールで Chrome を別インスタンスとして起動するため、
-`web-server` でサーバーのみ起動し、既存の Chrome で `http://localhost:8080` を開くことを推奨。
+For web, `flutter run -d chrome` launches Chrome as a separate instance with a dedicated temporary profile.
+It is recommended to use `web-server` to start the server only, then open `http://localhost:8080` in your existing Chrome.
