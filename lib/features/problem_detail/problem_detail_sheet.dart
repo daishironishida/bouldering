@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,75 +29,90 @@ class ProblemDetailSheet extends ConsumerWidget {
     final state = problem.cellState;
     final active = problem?.activeGeneration;
 
+    final titleRow = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Text(
+            '$gradeName  $number番',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const Spacer(),
+          _StatusChip(state: state),
+        ],
+      ),
+    );
+
+    Widget buildContent(ScrollController scrollController) => Column(
+          children: [
+            if (!kIsWeb)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            if (kIsWeb)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            titleRow,
+            const Divider(height: 24),
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  if (active != null) ...[
+                    _LabelEditor(problemKey: _key, currentLabel: active.label),
+                    const SizedBox(height: 16),
+                  ],
+                  _ActionButtons(
+                    problemKey: _key,
+                    state: state,
+                    onClose: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(height: 24),
+                  if (problem != null && problem.generations.isNotEmpty) ...[
+                    const Text('クリア履歴',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    _GenerationHistory(
+                      problem: problem,
+                      problemKey: _key,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+
+    if (kIsWeb) {
+      final scrollController = ScrollController();
+      return buildContent(scrollController);
+    }
+
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.4,
       maxChildSize: 0.95,
       expand: false,
-      builder: (context, scrollController) => Column(
-        children: [
-          // ─── ドラッグハンドル ───────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          // ─── タイトル ──────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Text(
-                  '$gradeName  $number番',
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const Spacer(),
-                _StatusChip(state: state),
-              ],
-            ),
-          ),
-          const Divider(height: 24),
-          // ─── スクロール可能なコンテンツ ────────────────────────────────
-          Expanded(
-            child: ListView(
-              controller: scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                // ラベル編集（課題がある場合のみ）
-                if (active != null) ...[
-                  _LabelEditor(problemKey: _key, currentLabel: active.label),
-                  const SizedBox(height: 16),
-                ],
-                // アクションボタン群
-                _ActionButtons(
-                  problemKey: _key,
-                  state: state,
-                  onClose: () => Navigator.pop(context),
-                ),
-                const SizedBox(height: 24),
-                // クリアログ一覧（全世代）
-                if (problem != null && problem.generations.isNotEmpty) ...[
-                  const Text('クリア履歴',
-                      style: TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  _GenerationHistory(
-                    problem: problem,
-                    problemKey: _key,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
+      builder: (context, scrollController) => buildContent(scrollController),
     );
   }
 }

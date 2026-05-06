@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -245,16 +246,35 @@ class _GradeRow extends ConsumerWidget {
   }
 
   void _openDetail(BuildContext context, WidgetRef ref, int number) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => ProblemDetailSheet(
-        gymId: gymId,
-        gradeId: grade.id,
-        gradeName: grade.name,
-        number: number,
-      ),
-    );
+    if (kIsWeb) {
+      showDialog<void>(
+        context: context,
+        builder: (context) => Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560, maxHeight: 700),
+            child: ProblemDetailSheet(
+              gymId: gymId,
+              gradeId: grade.id,
+              gradeName: grade.name,
+              number: number,
+            ),
+          ),
+        ),
+      );
+    } else {
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (context) => ProblemDetailSheet(
+          gymId: gymId,
+          gradeId: grade.id,
+          gradeName: grade.name,
+          number: number,
+        ),
+      );
+    }
   }
 }
