@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/grade_config.dart';
 import '../../core/theme/app_theme.dart';
+import '../grid/grid_provider.dart';
 import 'gym_settings_provider.dart';
 
 class GymSettingsScreen extends ConsumerWidget {
@@ -105,15 +106,21 @@ class GymSettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _showAddGradeDialog(BuildContext context, WidgetRef ref) async {
+    final problems = ref.read(gymProblemsProvider(gymId));
+    final defaultCount = problems.values
+        .map((p) => p.number)
+        .fold<int>(0, (m, n) => n > m ? n : m);
     await showDialog<void>(
       context: context,
       builder: (context) => _GradeEditDialog(
         gymId: gymId,
+        initialCount: defaultCount > 0 ? defaultCount : 10,
+        showCountField: true,
         onSave: (name, colorHex, count) async {
           await ref.read(gymSettingsProvider(gymId).notifier).addGrade(
                 name: name,
                 colorHex: colorHex,
-                problemCount: count,
+                initialProblemCount: count ?? 0,
               );
         },
       ),
@@ -130,6 +137,8 @@ class _GradeTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final color = hexToColor(grade.colorHex);
+    final problems = ref.watch(gymProblemsProvider(gymId));
+    final count = problems.values.where((p) => p.gradeId == grade.id).length;
     return ListTile(
       leading: Container(
         width: 32,
@@ -137,7 +146,7 @@ class _GradeTile extends ConsumerWidget {
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       ),
       title: Text(grade.name),
-      subtitle: Text('${grade.problemCount} 問'),
+      subtitle: Text('$count 問'),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -162,11 +171,10 @@ class _GradeTile extends ConsumerWidget {
         gymId: gymId,
         initialName: grade.name,
         initialColorHex: grade.colorHex,
-        initialCount: grade.problemCount,
+        showCountField: false,
         onSave: (name, colorHex, count) async {
           await ref.read(gymSettingsProvider(gymId).notifier).updateGrade(
-                grade.copyWith(
-                    name: name, colorHex: colorHex, problemCount: count),
+                grade.copyWith(name: name, colorHex: colorHex),
               );
         },
       ),
@@ -200,13 +208,15 @@ class _GradeEditDialog extends StatefulWidget {
   const _GradeEditDialog({
     required this.gymId,
     required this.onSave,
+    required this.showCountField,
     this.initialName,
     this.initialColorHex,
     this.initialCount,
   });
 
   final String gymId;
-  final Future<void> Function(String name, String colorHex, int count) onSave;
+  final Future<void> Function(String name, String colorHex, int? count) onSave;
+  final bool showCountField;
   final String? initialName;
   final String? initialColorHex;
   final int? initialCount;
@@ -252,12 +262,14 @@ class _GradeEditDialogState extends State<_GradeEditDialog> {
               autofocus: true,
               decoration: const InputDecoration(labelText: 'グレード名（例: 8級）'),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _countController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: '課題数'),
-            ),
+            if (widget.showCountField) ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: _countController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: '初期課題数'),
+              ),
+            ],
             const SizedBox(height: 16),
             const Text('カラー', style: TextStyle(fontSize: 12, color: Colors.grey)),
             const SizedBox(height: 8),
@@ -295,7 +307,9 @@ class _GradeEditDialogState extends State<_GradeEditDialog> {
         TextButton(
           onPressed: () async {
             final name = _nameController.text.trim();
-            final count = int.tryParse(_countController.text.trim()) ?? 10;
+            final count = widget.showCountField
+                ? (int.tryParse(_countController.text.trim()) ?? 0)
+                : null;
             if (name.isEmpty) return;
             await widget.onSave(name, _selectedColorHex, count);
             if (context.mounted) Navigator.pop(context);

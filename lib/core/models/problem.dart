@@ -19,11 +19,8 @@ class Problem with _$Problem {
       _$ProblemFromJson(json);
 }
 
-/// グリッドセルの状態
+/// グリッドセルの状態（Problem レコードが存在するスロットの状態）
 enum CellState {
-  /// 一度も課題が登録されていない
-  unregistered,
-
   /// 過去に課題があったが現在は削除済み
   deleted,
 
@@ -34,22 +31,14 @@ enum CellState {
   cleared,
 }
 
-extension ProblemExtension on Problem? {
+extension ProblemExtension on Problem {
+  Generation? get activeGeneration =>
+      generations.where((g) => g.isActive).firstOrNull;
+
   CellState get cellState {
-    final problem = this;
-    if (problem == null || problem.generations.isEmpty) {
-      return CellState.unregistered;
-    }
-    final active = problem.activeGeneration;
+    final active = activeGeneration;
     if (active == null) return CellState.deleted;
     if (active.clearLogs.isNotEmpty) return CellState.cleared;
     return CellState.uncleared;
   }
-}
-
-extension ProblemNonNullExtension on Problem {
-  Generation? get activeGeneration =>
-      generations.where((g) => g.isActive).firstOrNull;
-
-  bool get hasEverExisted => generations.isNotEmpty;
 }

@@ -29,7 +29,7 @@ class GymSettingsNotifier extends FamilyAsyncNotifier<Gym, String> {
   Future<void> addGrade({
     required String name,
     required String colorHex,
-    required int problemCount,
+    required int initialProblemCount,
   }) async {
     final gym = await future;
     final gradeId = const Uuid().v4();
@@ -38,20 +38,18 @@ class GymSettingsNotifier extends FamilyAsyncNotifier<Gym, String> {
       name: name,
       colorHex: colorHex,
       order: gym.grades.length,
-      problemCount: problemCount,
     );
     await _save(gym.copyWith(grades: [...gym.grades, grade]));
-    await _createProblemsForGrade(gym.id, gradeId, problemCount);
+    await _createProblemsForGrade(gym.id, gradeId, initialProblemCount);
   }
 
   Future<void> updateGrade(GradeConfig updated) async {
     final gym = await future;
     final grades = gym.grades.map((g) => g.id == updated.id ? updated : g).toList();
     await _save(gym.copyWith(grades: grades));
-    await _createProblemsForGrade(gym.id, updated.id, updated.problemCount);
   }
 
-  /// 未登録スロット（null）に対してのみ新規課題を自動作成する
+  /// 1..N の位置に Problem を作成（既存スロットはスキップ）
   Future<void> _createProblemsForGrade(
       String gymId, String gradeId, int problemCount) async {
     final repo = ref.read(gymRepositoryProvider);

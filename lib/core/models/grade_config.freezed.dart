@@ -25,7 +25,6 @@ mixin _$GradeConfig {
   String get name => throw _privateConstructorUsedError;
   String get colorHex => throw _privateConstructorUsedError;
   int get order => throw _privateConstructorUsedError;
-  int get problemCount => throw _privateConstructorUsedError;
 
   /// Serializes this GradeConfig to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,13 +43,7 @@ abstract class $GradeConfigCopyWith<$Res> {
     $Res Function(GradeConfig) then,
   ) = _$GradeConfigCopyWithImpl<$Res, GradeConfig>;
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String colorHex,
-    int order,
-    int problemCount,
-  });
+  $Res call({String id, String name, String colorHex, int order});
 }
 
 /// @nodoc
@@ -72,7 +65,6 @@ class _$GradeConfigCopyWithImpl<$Res, $Val extends GradeConfig>
     Object? name = null,
     Object? colorHex = null,
     Object? order = null,
-    Object? problemCount = null,
   }) {
     return _then(
       _value.copyWith(
@@ -92,10 +84,6 @@ class _$GradeConfigCopyWithImpl<$Res, $Val extends GradeConfig>
                 ? _value.order
                 : order // ignore: cast_nullable_to_non_nullable
                       as int,
-            problemCount: null == problemCount
-                ? _value.problemCount
-                : problemCount // ignore: cast_nullable_to_non_nullable
-                      as int,
           )
           as $Val,
     );
@@ -111,13 +99,7 @@ abstract class _$$GradeConfigImplCopyWith<$Res>
   ) = __$$GradeConfigImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String id,
-    String name,
-    String colorHex,
-    int order,
-    int problemCount,
-  });
+  $Res call({String id, String name, String colorHex, int order});
 }
 
 /// @nodoc
@@ -138,7 +120,6 @@ class __$$GradeConfigImplCopyWithImpl<$Res>
     Object? name = null,
     Object? colorHex = null,
     Object? order = null,
-    Object? problemCount = null,
   }) {
     return _then(
       _$GradeConfigImpl(
@@ -158,10 +139,6 @@ class __$$GradeConfigImplCopyWithImpl<$Res>
             ? _value.order
             : order // ignore: cast_nullable_to_non_nullable
                   as int,
-        problemCount: null == problemCount
-            ? _value.problemCount
-            : problemCount // ignore: cast_nullable_to_non_nullable
-                  as int,
       ),
     );
   }
@@ -175,7 +152,6 @@ class _$GradeConfigImpl implements _GradeConfig {
     required this.name,
     required this.colorHex,
     required this.order,
-    required this.problemCount,
   });
 
   factory _$GradeConfigImpl.fromJson(Map<String, dynamic> json) =>
@@ -189,12 +165,10 @@ class _$GradeConfigImpl implements _GradeConfig {
   final String colorHex;
   @override
   final int order;
-  @override
-  final int problemCount;
 
   @override
   String toString() {
-    return 'GradeConfig(id: $id, name: $name, colorHex: $colorHex, order: $order, problemCount: $problemCount)';
+    return 'GradeConfig(id: $id, name: $name, colorHex: $colorHex, order: $order)';
   }
 
   @override
@@ -206,15 +180,12 @@ class _$GradeConfigImpl implements _GradeConfig {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.colorHex, colorHex) ||
                 other.colorHex == colorHex) &&
-            (identical(other.order, order) || other.order == order) &&
-            (identical(other.problemCount, problemCount) ||
-                other.problemCount == problemCount));
+            (identical(other.order, order) || other.order == order));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, colorHex, order, problemCount);
+  int get hashCode => Object.hash(runtimeType, id, name, colorHex, order);
 
   /// Create a copy of GradeConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -236,7 +207,6 @@ abstract class _GradeConfig implements GradeConfig {
     required final String name,
     required final String colorHex,
     required final int order,
-    required final int problemCount,
   }) = _$GradeConfigImpl;
 
   factory _GradeConfig.fromJson(Map<String, dynamic> json) =
@@ -250,8 +220,6 @@ abstract class _GradeConfig implements GradeConfig {
   String get colorHex;
   @override
   int get order;
-  @override
-  int get problemCount;
 
   /// Create a copy of GradeConfig
   /// with the given fields replaced by the non-null parameter values.
