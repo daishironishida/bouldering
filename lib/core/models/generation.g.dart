@@ -11,7 +11,6 @@ _$GenerationImpl _$$GenerationImplFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       order: (json['order'] as num).toInt(),
       isActive: json['isActive'] as bool,
-      label: json['label'] as String?,
       area: json['area'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       clearLogs:
@@ -26,7 +25,6 @@ Map<String, dynamic> _$$GenerationImplToJson(_$GenerationImpl instance) =>
       'id': instance.id,
       'order': instance.order,
       'isActive': instance.isActive,
-      'label': instance.label,
       'area': instance.area,
       'createdAt': instance.createdAt.toIso8601String(),
       'clearLogs': instance.clearLogs,

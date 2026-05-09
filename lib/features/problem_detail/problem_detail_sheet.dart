@@ -89,17 +89,14 @@ class ProblemDetailSheet extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 children: [
                   if (active != null) ...[
-                    _LabelEditor(
-                        problemKey: _key, currentLabel: active.label),
                     if (gymAreas.isNotEmpty) ...[
-                      const SizedBox(height: 12),
                       _AreaSelector(
                         problemKey: _key,
                         areas: gymAreas,
                         selectedArea: active.area,
                       ),
+                      const SizedBox(height: 20),
                     ],
-                    const SizedBox(height: 20),
                   ],
                   _ActionButtons(
                     problemKey: _key,
@@ -187,79 +184,6 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-class _LabelEditor extends ConsumerStatefulWidget {
-  const _LabelEditor({required this.problemKey, required this.currentLabel});
-  final ProblemKey problemKey;
-  final String? currentLabel;
-
-  @override
-  ConsumerState<_LabelEditor> createState() => _LabelEditorState();
-}
-
-class _LabelEditorState extends ConsumerState<_LabelEditor> {
-  late final TextEditingController _controller;
-  bool _editing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.currentLabel ?? '');
-  }
-
-  @override
-  void didUpdateWidget(_LabelEditor old) {
-    super.didUpdateWidget(old);
-    if (old.currentLabel != widget.currentLabel && !_editing) {
-      _controller.text = widget.currentLabel ?? '';
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(Icons.label_outline, size: 18, color: Colors.white.withAlpha(80)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              hintText: 'ラベル（壁番号など）',
-              isDense: true,
-            ),
-            onTap: () => setState(() => _editing = true),
-            onSubmitted: (_) => _save(),
-            onTapOutside: (_) {
-              if (_editing) _save();
-            },
-          ),
-        ),
-        if (_editing) ...[
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.check_rounded,
-                color: Color(0xFF4ADE80), size: 20),
-            onPressed: _save,
-          ),
-        ],
-      ],
-    );
-  }
-
-  void _save() {
-    ref
-        .read(problemDetailProvider(widget.problemKey).notifier)
-        .updateLabel(_controller.text);
-    setState(() => _editing = false);
-    FocusScope.of(context).unfocus();
-  }
-}
 
 class _AreaSelector extends ConsumerWidget {
   const _AreaSelector({

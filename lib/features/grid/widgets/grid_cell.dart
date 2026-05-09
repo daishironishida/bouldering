@@ -75,30 +75,11 @@ class _CellContent extends StatelessWidget {
       return const SizedBox.expand();
     }
 
-    final label = problem?.activeGeneration?.label ?? '';
     final area = problem?.activeGeneration?.area ?? '';
     final isCleared = state == CellState.cleared;
 
     return Stack(
       children: [
-        if (label.isNotEmpty)
-          Positioned(
-            top: 4,
-            left: 6,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: isCleared
-                    ? Colors.white.withAlpha(200)
-                    : Colors.white.withAlpha(160),
-                height: 1.2,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
         if (area.isNotEmpty)
           Positioned(
             bottom: 4,

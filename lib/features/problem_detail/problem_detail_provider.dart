@@ -50,19 +50,6 @@ class ProblemDetailNotifier extends FamilyNotifier<Problem?, ProblemKey> {
     ));
   }
 
-  /// アクティブ世代のラベルを更新
-  Future<void> updateLabel(String label) async {
-    final problem = _requireProblem();
-    final active = problem.activeGeneration;
-    if (active == null) return;
-    await _save(problem.copyWith(
-      generations: problem.generations
-          .map((g) =>
-              g.id == active.id ? g.copyWith(label: label.isEmpty ? null : label) : g)
-          .toList(),
-    ));
-  }
-
   /// 現在日時でクリア記録を追加
   Future<void> addClearLog() async {
     final problem = _requireProblem();
