@@ -11,7 +11,7 @@ class Generation with _$Generation {
     required String id,
     required int order,
     required bool isActive,
-    String? label,
+    String? area,
     required DateTime createdAt,
     @Default([]) List<ClearLog> clearLogs,
   }) = _Generation;

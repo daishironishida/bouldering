@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/clear_log.dart';
 import '../../core/models/generation.dart';
 import '../../core/models/problem.dart';
+import '../grid/grid_provider.dart';
 import 'problem_detail_provider.dart';
 
 class ProblemDetailSheet extends ConsumerWidget {
@@ -28,6 +29,10 @@ class ProblemDetailSheet extends ConsumerWidget {
     final problem = ref.watch(problemDetailProvider(_key));
     final state = problem.cellState;
     final active = problem?.activeGeneration;
+    final gymAreas = ref.watch(gymProvider(gymId)).maybeWhen(
+          data: (gym) => gym.areas,
+          orElse: () => <String>[],
+        );
 
     Widget buildContent(ScrollController scrollController) => Column(
           children: [
@@ -84,9 +89,14 @@ class ProblemDetailSheet extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 children: [
                   if (active != null) ...[
-                    _LabelEditor(
-                        problemKey: _key, currentLabel: active.label),
-                    const SizedBox(height: 20),
+                    if (gymAreas.isNotEmpty) ...[
+                      _AreaSelector(
+                        problemKey: _key,
+                        areas: gymAreas,
+                        selectedArea: active.area,
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ],
                   _ActionButtons(
                     problemKey: _key,
@@ -174,77 +184,71 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-class _LabelEditor extends ConsumerStatefulWidget {
-  const _LabelEditor({required this.problemKey, required this.currentLabel});
+
+class _AreaSelector extends ConsumerWidget {
+  const _AreaSelector({
+    required this.problemKey,
+    required this.areas,
+    required this.selectedArea,
+  });
+
   final ProblemKey problemKey;
-  final String? currentLabel;
+  final List<String> areas;
+  final String? selectedArea;
 
   @override
-  ConsumerState<_LabelEditor> createState() => _LabelEditorState();
-}
-
-class _LabelEditorState extends ConsumerState<_LabelEditor> {
-  late final TextEditingController _controller;
-  bool _editing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.currentLabel ?? '');
-  }
-
-  @override
-  void didUpdateWidget(_LabelEditor old) {
-    super.didUpdateWidget(old);
-    if (old.currentLabel != widget.currentLabel && !_editing) {
-      _controller.text = widget.currentLabel ?? '';
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
-        Icon(Icons.label_outline, size: 18, color: Colors.white.withAlpha(80)),
+        Icon(Icons.location_on_outlined,
+            size: 18, color: Colors.white.withAlpha(80)),
         const SizedBox(width: 10),
         Expanded(
-          child: TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              hintText: 'ラベル（壁番号など）',
-              isDense: true,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: areas.map((area) {
+                final selected = area == selectedArea;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: GestureDetector(
+                    onTap: () => ref
+                        .read(problemDetailProvider(problemKey).notifier)
+                        .updateArea(selected ? null : area),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? const Color(0xFF7C6AF5)
+                            : const Color(0xFF1E1E2C),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: selected
+                              ? const Color(0xFF7C6AF5)
+                              : const Color(0xFF2A2A38),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        area,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: selected
+                              ? Colors.white
+                              : Colors.white.withAlpha(160),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
-            onTap: () => setState(() => _editing = true),
-            onSubmitted: (_) => _save(),
-            onTapOutside: (_) {
-              if (_editing) _save();
-            },
           ),
         ),
-        if (_editing) ...[
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.check_rounded,
-                color: Color(0xFF4ADE80), size: 20),
-            onPressed: _save,
-          ),
-        ],
       ],
     );
-  }
-
-  void _save() {
-    ref
-        .read(problemDetailProvider(widget.problemKey).notifier)
-        .updateLabel(_controller.text);
-    setState(() => _editing = false);
-    FocusScope.of(context).unfocus();
   }
 }
 

@@ -38,15 +38,14 @@ class ProblemDetailNotifier extends FamilyNotifier<Problem?, ProblemKey> {
     return ref.read(gymRepositoryProvider).getProblem(gymId, gradeId, number);
   }
 
-  /// アクティブ世代のラベルを更新
-  Future<void> updateLabel(String label) async {
+  /// アクティブ世代のエリアを更新
+  Future<void> updateArea(String? area) async {
     final problem = _requireProblem();
     final active = problem.activeGeneration;
     if (active == null) return;
     await _save(problem.copyWith(
       generations: problem.generations
-          .map((g) =>
-              g.id == active.id ? g.copyWith(label: label.isEmpty ? null : label) : g)
+          .map((g) => g.id == active.id ? g.copyWith(area: area) : g)
           .toList(),
     ));
   }

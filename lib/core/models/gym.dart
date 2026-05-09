@@ -12,6 +12,7 @@ class Gym with _$Gym {
     required String name,
     required DateTime createdAt,
     @Default([]) List<GradeConfig> grades,
+    @Default([]) List<String> areas,
   }) = _Gym;
 
   factory Gym.fromJson(Map<String, dynamic> json) => _$GymFromJson(json);
