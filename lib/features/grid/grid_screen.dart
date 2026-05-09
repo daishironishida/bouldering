@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,22 +91,29 @@ class _GridScreenState extends ConsumerState<GridScreen> {
           return _buildGrid(gym.grades, problems);
         },
       ),
+      floatingActionButton: gymAsync.maybeWhen(
+        data: (gym) => gym.grades.isEmpty
+            ? null
+            : FloatingActionButton(
+                tooltip: '列を追加',
+                onPressed: () => ref
+                    .read(gymProblemsProvider(widget.gymId).notifier)
+                    .appendColumnToAllGrades(),
+                child: const Icon(Icons.add),
+              ),
+        orElse: () => null,
+      ),
     );
   }
 
-  int _effectiveColumnCount(GradeConfig grade, Map<String, Problem> problems) {
-    int maxNum = grade.problemCount;
-    for (final entry in problems.entries) {
-      if (entry.key.startsWith('${grade.id}_')) {
-        maxNum = math.max(maxNum, entry.value.number);
-      }
-    }
-    return maxNum;
+  int _tableCols(Map<String, Problem> problems) {
+    return problems.values
+        .map((p) => p.number)
+        .fold<int>(0, (m, n) => n > m ? n : m);
   }
 
   Widget _buildGrid(List<GradeConfig> grades, Map<String, Problem> problems) {
-    final maxProblems = grades.fold(
-        0, (max, g) => math.max(max, _effectiveColumnCount(g, problems)));
+    final tableCols = _tableCols(problems);
 
     return Column(
       children: [
@@ -124,7 +129,7 @@ class _GridScreenState extends ConsumerState<GridScreen> {
                   controller: _headerScrollController,
                   physics: const NeverScrollableScrollPhysics(),
                   child: Row(
-                    children: List.generate(maxProblems, (i) {
+                    children: List.generate(tableCols, (i) {
                       return SizedBox(
                         width: kCellWidth + kCellGap,
                         child: Center(
@@ -196,8 +201,8 @@ class _GridScreenState extends ConsumerState<GridScreen> {
                           child: _GradeRow(
                             gymId: widget.gymId,
                             grade: grade,
-                            columnCount:
-                                _effectiveColumnCount(grade, problems),
+                            columnCount: tableCols,
+                            problems: problems,
                           ),
                         );
                       }).toList(),
@@ -213,38 +218,42 @@ class _GridScreenState extends ConsumerState<GridScreen> {
   }
 }
 
-class _GradeRow extends ConsumerWidget {
+class _GradeRow extends StatelessWidget {
   const _GradeRow({
     required this.gymId,
     required this.grade,
     required this.columnCount,
+    required this.problems,
   });
 
   final String gymId;
   final GradeConfig grade;
   final int columnCount;
+  final Map<String, Problem> problems;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final problems = ref.watch(gymProblemsProvider(gymId));
-
+  Widget build(BuildContext context) {
     return Row(
       children: List.generate(columnCount, (i) {
         final number = i + 1;
         final problem = problems['${grade.id}_$number'];
         return Padding(
           padding: const EdgeInsets.only(right: kCellGap),
-          child: GridCell(
-            problem: problem,
-            gradeColorHex: grade.colorHex,
-            onTap: () => _openDetail(context, ref, number),
-          ),
+          child: problem == null
+              ? GridPaddingCell(
+                  onTap: () => _openDetail(context, number),
+                )
+              : GridCell(
+                  problem: problem,
+                  gradeColorHex: grade.colorHex,
+                  onTap: () => _openDetail(context, number),
+                ),
         );
       }),
     );
   }
 
-  void _openDetail(BuildContext context, WidgetRef ref, int number) {
+  void _openDetail(BuildContext context, int number) {
     if (kIsWeb) {
       showDialog<void>(
         context: context,

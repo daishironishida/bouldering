@@ -5,15 +5,15 @@
     "createdAt": "2024-01-01T00:00:00.000",
     "areas": ["A", "B", "C", "D", "E", "F", "G", "H"],
     "grades": [
-      { "id": "spodori-kids", "name": "キッズ",  "colorHex": "00BCD4", "order": 0, "problemCount": 9  },
-      { "id": "spodori-7kyu", "name": "7級",     "colorHex": "E91E63", "order": 1, "problemCount": 9  },
-      { "id": "spodori-6kyu", "name": "6級",     "colorHex": "4CAF50", "order": 2, "problemCount": 14 },
-      { "id": "spodori-5kyu", "name": "5級",     "colorHex": "FFEB3B", "order": 3, "problemCount": 19 },
-      { "id": "spodori-4kyu", "name": "4級",     "colorHex": "3F51B5", "order": 4, "problemCount": 20 },
-      { "id": "spodori-3kyu", "name": "3級",     "colorHex": "F44336", "order": 5, "problemCount": 21 },
-      { "id": "spodori-2kyu", "name": "2級",     "colorHex": "212121", "order": 6, "problemCount": 17 },
-      { "id": "spodori-1kyu", "name": "1級",     "colorHex": "FFFFFF", "order": 7, "problemCount": 11 },
-      { "id": "spodori-shodan", "name": "初段以上", "colorHex": "795548", "order": 8, "problemCount": 5  }
+      { "id": "spodori-kids", "name": "キッズ",  "colorHex": "00BCD4", "order": 0 },
+      { "id": "spodori-7kyu", "name": "7級",     "colorHex": "E91E63", "order": 1 },
+      { "id": "spodori-6kyu", "name": "6級",     "colorHex": "4CAF50", "order": 2 },
+      { "id": "spodori-5kyu", "name": "5級",     "colorHex": "FFEB3B", "order": 3 },
+      { "id": "spodori-4kyu", "name": "4級",     "colorHex": "3F51B5", "order": 4 },
+      { "id": "spodori-3kyu", "name": "3級",     "colorHex": "F44336", "order": 5 },
+      { "id": "spodori-2kyu", "name": "2級",     "colorHex": "212121", "order": 6 },
+      { "id": "spodori-1kyu", "name": "1級",     "colorHex": "FFFFFF", "order": 7 },
+      { "id": "spodori-shodan", "name": "初段以上", "colorHex": "795548", "order": 8 }
     ]
   },
   "problems": [

@@ -27,7 +27,7 @@ class ProblemDetailSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final problem = ref.watch(problemDetailProvider(_key));
-    final state = problem.cellState;
+    final state = problem?.cellState;
     final active = problem?.activeGeneration;
     final gymAreas = ref.watch(gymProvider(gymId)).maybeWhen(
           data: (gym) => gym.areas,
@@ -76,7 +76,7 @@ class ProblemDetailSheet extends ConsumerWidget {
                     ),
                   ),
                   const Spacer(),
-                  _StatusChip(state: state),
+                  if (state != null) _StatusChip(state: state),
                 ],
               ),
             ),
@@ -160,11 +160,6 @@ class _StatusChip extends StatelessWidget {
         ),
       CellState.deleted => (
           '削除済み',
-          Colors.white.withAlpha(15),
-          Colors.white38,
-        ),
-      CellState.unregistered => (
-          '未登録',
           Colors.white.withAlpha(15),
           Colors.white38,
         ),
@@ -260,16 +255,19 @@ class _ActionButtons extends ConsumerWidget {
   });
 
   final ProblemKey problemKey;
-  final CellState state;
+  final CellState? state;
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(problemDetailProvider(problemKey).notifier);
+    final isNew = state == null || state == CellState.deleted;
+    final hasActive =
+        state == CellState.uncleared || state == CellState.cleared;
 
     return Column(
       children: [
-        if (state == CellState.uncleared || state == CellState.cleared)
+        if (hasActive)
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
@@ -290,8 +288,6 @@ class _ActionButtons extends ConsumerWidget {
           width: double.infinity,
           child: OutlinedButton.icon(
             onPressed: () async {
-              final isNew = state == CellState.unregistered ||
-                  state == CellState.deleted;
               if (!isNew) {
                 final confirmed = await showDialog<bool>(
                   context: context,
@@ -319,19 +315,13 @@ class _ActionButtons extends ConsumerWidget {
               }
             },
             icon: Icon(
-              state == CellState.unregistered || state == CellState.deleted
-                  ? Icons.add
-                  : Icons.refresh_rounded,
+              isNew ? Icons.add : Icons.refresh_rounded,
               size: 18,
             ),
-            label: Text(
-              state == CellState.unregistered || state == CellState.deleted
-                  ? '課題を追加'
-                  : 'ホールド替え',
-            ),
+            label: Text(isNew ? '課題を追加' : 'ホールド替え'),
           ),
         ),
-        if (state == CellState.uncleared || state == CellState.cleared) ...[
+        if (hasActive) ...[
           const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,

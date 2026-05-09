@@ -10,7 +10,6 @@ class GradeConfig with _$GradeConfig {
     required String name,
     required String colorHex,
     required int order,
-    required int problemCount,
   }) = _GradeConfig;
 
   factory GradeConfig.fromJson(Map<String, dynamic> json) =>

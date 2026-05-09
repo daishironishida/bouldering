@@ -12,7 +12,6 @@ _$GradeConfigImpl _$$GradeConfigImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       colorHex: json['colorHex'] as String,
       order: (json['order'] as num).toInt(),
-      problemCount: (json['problemCount'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$GradeConfigImplToJson(_$GradeConfigImpl instance) =>
@@ -21,5 +20,4 @@ Map<String, dynamic> _$$GradeConfigImplToJson(_$GradeConfigImpl instance) =>
       'name': instance.name,
       'colorHex': instance.colorHex,
       'order': instance.order,
-      'problemCount': instance.problemCount,
     };

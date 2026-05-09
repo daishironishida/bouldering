@@ -10,6 +10,7 @@ const double kNumberRowHeight = 28.0;
 const double kCellGap = 4.0;
 const double kCellRadius = 10.0;
 
+/// Problem レコードが存在するセル
 class GridCell extends StatelessWidget {
   const GridCell({
     super.key,
@@ -18,7 +19,7 @@ class GridCell extends StatelessWidget {
     required this.onTap,
   });
 
-  final Problem? problem;
+  final Problem problem;
   final String gradeColorHex;
   final VoidCallback onTap;
 
@@ -35,19 +36,15 @@ class GridCell extends StatelessWidget {
         decoration: BoxDecoration(
           color: _bgColor(state, gradeColor),
           borderRadius: BorderRadius.circular(kCellRadius),
-          border: state == CellState.unregistered
-              ? null
-              : null,
         ),
-        child: _CellContent(state: state, problem: problem, gradeColor: gradeColor),
+        child: _CellContent(
+            state: state, problem: problem, gradeColor: gradeColor),
       ),
     );
   }
 
   Color _bgColor(CellState state, Color gradeColor) {
     switch (state) {
-      case CellState.unregistered:
-        return const Color(0xFF16161F);
       case CellState.deleted:
         return const Color(0xFF16161F);
       case CellState.uncleared:
@@ -66,16 +63,16 @@ class _CellContent extends StatelessWidget {
   });
 
   final CellState state;
-  final Problem? problem;
+  final Problem problem;
   final Color gradeColor;
 
   @override
   Widget build(BuildContext context) {
-    if (state == CellState.unregistered || state == CellState.deleted) {
+    if (state == CellState.deleted) {
       return const SizedBox.expand();
     }
 
-    final area = problem?.activeGeneration?.area ?? '';
+    final area = problem.activeGeneration?.area ?? '';
     final isCleared = state == CellState.cleared;
 
     return Stack(
@@ -102,6 +99,31 @@ class _CellContent extends StatelessWidget {
             child: Icon(Icons.check_rounded, size: 14, color: Colors.white),
           ),
       ],
+    );
+  }
+}
+
+/// テーブル幅に対する空きスロット（このグレードにはまだ Problem が無い位置）
+class GridPaddingCell extends StatelessWidget {
+  const GridPaddingCell({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: kCellWidth,
+        height: kCellHeight,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(kCellRadius),
+          border: Border.all(
+            color: Colors.white.withAlpha(15),
+            width: 1,
+          ),
+        ),
+      ),
     );
   }
 }
