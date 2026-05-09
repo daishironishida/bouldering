@@ -25,6 +25,7 @@ mixin _$Gym {
   String get name => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   List<GradeConfig> get grades => throw _privateConstructorUsedError;
+  List<String> get areas => throw _privateConstructorUsedError;
 
   /// Serializes this Gym to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,6 +46,7 @@ abstract class $GymCopyWith<$Res> {
     String name,
     DateTime createdAt,
     List<GradeConfig> grades,
+    List<String> areas,
   });
 }
 
@@ -66,6 +68,7 @@ class _$GymCopyWithImpl<$Res, $Val extends Gym> implements $GymCopyWith<$Res> {
     Object? name = null,
     Object? createdAt = null,
     Object? grades = null,
+    Object? areas = null,
   }) {
     return _then(
       _value.copyWith(
@@ -85,6 +88,10 @@ class _$GymCopyWithImpl<$Res, $Val extends Gym> implements $GymCopyWith<$Res> {
                 ? _value.grades
                 : grades // ignore: cast_nullable_to_non_nullable
                       as List<GradeConfig>,
+            areas: null == areas
+                ? _value.areas
+                : areas // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
           )
           as $Val,
     );
@@ -102,6 +109,7 @@ abstract class _$$GymImplCopyWith<$Res> implements $GymCopyWith<$Res> {
     String name,
     DateTime createdAt,
     List<GradeConfig> grades,
+    List<String> areas,
   });
 }
 
@@ -120,6 +128,7 @@ class __$$GymImplCopyWithImpl<$Res> extends _$GymCopyWithImpl<$Res, _$GymImpl>
     Object? name = null,
     Object? createdAt = null,
     Object? grades = null,
+    Object? areas = null,
   }) {
     return _then(
       _$GymImpl(
@@ -139,6 +148,10 @@ class __$$GymImplCopyWithImpl<$Res> extends _$GymCopyWithImpl<$Res, _$GymImpl>
             ? _value._grades
             : grades // ignore: cast_nullable_to_non_nullable
                   as List<GradeConfig>,
+        areas: null == areas
+            ? _value._areas
+            : areas // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
       ),
     );
   }
@@ -152,7 +165,9 @@ class _$GymImpl implements _Gym {
     required this.name,
     required this.createdAt,
     final List<GradeConfig> grades = const [],
-  }) : _grades = grades;
+    final List<String> areas = const [],
+  }) : _grades = grades,
+       _areas = areas;
 
   factory _$GymImpl.fromJson(Map<String, dynamic> json) =>
       _$$GymImplFromJson(json);
@@ -172,9 +187,18 @@ class _$GymImpl implements _Gym {
     return EqualUnmodifiableListView(_grades);
   }
 
+  final List<String> _areas;
+  @override
+  @JsonKey()
+  List<String> get areas {
+    if (_areas is EqualUnmodifiableListView) return _areas;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_areas);
+  }
+
   @override
   String toString() {
-    return 'Gym(id: $id, name: $name, createdAt: $createdAt, grades: $grades)';
+    return 'Gym(id: $id, name: $name, createdAt: $createdAt, grades: $grades, areas: $areas)';
   }
 
   @override
@@ -186,7 +210,8 @@ class _$GymImpl implements _Gym {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            const DeepCollectionEquality().equals(other._grades, _grades));
+            const DeepCollectionEquality().equals(other._grades, _grades) &&
+            const DeepCollectionEquality().equals(other._areas, _areas));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -197,6 +222,7 @@ class _$GymImpl implements _Gym {
     name,
     createdAt,
     const DeepCollectionEquality().hash(_grades),
+    const DeepCollectionEquality().hash(_areas),
   );
 
   /// Create a copy of Gym
@@ -219,6 +245,7 @@ abstract class _Gym implements Gym {
     required final String name,
     required final DateTime createdAt,
     final List<GradeConfig> grades,
+    final List<String> areas,
   }) = _$GymImpl;
 
   factory _Gym.fromJson(Map<String, dynamic> json) = _$GymImpl.fromJson;
@@ -231,6 +258,8 @@ abstract class _Gym implements Gym {
   DateTime get createdAt;
   @override
   List<GradeConfig> get grades;
+  @override
+  List<String> get areas;
 
   /// Create a copy of Gym
   /// with the given fields replaced by the non-null parameter values.

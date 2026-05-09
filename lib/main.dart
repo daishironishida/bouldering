@@ -34,6 +34,7 @@ final _spodoriGym = Gym(
   id: 'spodori',
   name: 'スポドリ',
   createdAt: DateTime(2024, 1, 1),
+  areas: const ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
   grades: const [
     GradeConfig(id: 'spodori-kids', name: 'キッズ', colorHex: '00BCD4', order: 0, problemCount: 10),
     GradeConfig(id: 'spodori-7kyu', name: '7級', colorHex: 'E91E63', order: 1, problemCount: 10),

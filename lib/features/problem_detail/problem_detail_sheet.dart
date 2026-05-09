@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/clear_log.dart';
 import '../../core/models/generation.dart';
 import '../../core/models/problem.dart';
+import '../grid/grid_provider.dart';
 import 'problem_detail_provider.dart';
 
 class ProblemDetailSheet extends ConsumerWidget {
@@ -28,6 +29,10 @@ class ProblemDetailSheet extends ConsumerWidget {
     final problem = ref.watch(problemDetailProvider(_key));
     final state = problem.cellState;
     final active = problem?.activeGeneration;
+    final gymAreas = ref.watch(gymProvider(gymId)).maybeWhen(
+          data: (gym) => gym.areas,
+          orElse: () => <String>[],
+        );
 
     Widget buildContent(ScrollController scrollController) => Column(
           children: [
@@ -86,6 +91,14 @@ class ProblemDetailSheet extends ConsumerWidget {
                   if (active != null) ...[
                     _LabelEditor(
                         problemKey: _key, currentLabel: active.label),
+                    if (gymAreas.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      _AreaSelector(
+                        problemKey: _key,
+                        areas: gymAreas,
+                        selectedArea: active.area,
+                      ),
+                    ],
                     const SizedBox(height: 20),
                   ],
                   _ActionButtons(
@@ -245,6 +258,73 @@ class _LabelEditorState extends ConsumerState<_LabelEditor> {
         .updateLabel(_controller.text);
     setState(() => _editing = false);
     FocusScope.of(context).unfocus();
+  }
+}
+
+class _AreaSelector extends ConsumerWidget {
+  const _AreaSelector({
+    required this.problemKey,
+    required this.areas,
+    required this.selectedArea,
+  });
+
+  final ProblemKey problemKey;
+  final List<String> areas;
+  final String? selectedArea;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Row(
+      children: [
+        Icon(Icons.location_on_outlined,
+            size: 18, color: Colors.white.withAlpha(80)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: areas.map((area) {
+                final selected = area == selectedArea;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: GestureDetector(
+                    onTap: () => ref
+                        .read(problemDetailProvider(problemKey).notifier)
+                        .updateArea(selected ? null : area),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? const Color(0xFF7C6AF5)
+                            : const Color(0xFF1E1E2C),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: selected
+                              ? const Color(0xFF7C6AF5)
+                              : const Color(0xFF2A2A38),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        area,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: selected
+                              ? Colors.white
+                              : Colors.white.withAlpha(160),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

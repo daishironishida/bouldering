@@ -15,6 +15,9 @@ _$GymImpl _$$GymImplFromJson(Map<String, dynamic> json) => _$GymImpl(
           ?.map((e) => GradeConfig.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  areas:
+      (json['areas'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$$GymImplToJson(_$GymImpl instance) => <String, dynamic>{
@@ -22,4 +25,5 @@ Map<String, dynamic> _$$GymImplToJson(_$GymImpl instance) => <String, dynamic>{
   'name': instance.name,
   'createdAt': instance.createdAt.toIso8601String(),
   'grades': instance.grades,
+  'areas': instance.areas,
 };

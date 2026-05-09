@@ -76,6 +76,7 @@ class _CellContent extends StatelessWidget {
     }
 
     final label = problem?.activeGeneration?.label ?? '';
+    final area = problem?.activeGeneration?.area ?? '';
     final isCleared = state == CellState.cleared;
 
     return Stack(
@@ -96,6 +97,21 @@ class _CellContent extends StatelessWidget {
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        if (area.isNotEmpty)
+          Positioned(
+            bottom: 4,
+            left: 6,
+            child: Text(
+              area,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: isCleared
+                    ? Colors.white.withAlpha(220)
+                    : Colors.white.withAlpha(180),
+              ),
             ),
           ),
         if (isCleared)

@@ -25,6 +25,7 @@ mixin _$Generation {
   int get order => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
   String? get label => throw _privateConstructorUsedError;
+  String? get area => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   List<ClearLog> get clearLogs => throw _privateConstructorUsedError;
 
@@ -50,6 +51,7 @@ abstract class $GenerationCopyWith<$Res> {
     int order,
     bool isActive,
     String? label,
+    String? area,
     DateTime createdAt,
     List<ClearLog> clearLogs,
   });
@@ -74,6 +76,7 @@ class _$GenerationCopyWithImpl<$Res, $Val extends Generation>
     Object? order = null,
     Object? isActive = null,
     Object? label = freezed,
+    Object? area = freezed,
     Object? createdAt = null,
     Object? clearLogs = null,
   }) {
@@ -94,6 +97,10 @@ class _$GenerationCopyWithImpl<$Res, $Val extends Generation>
             label: freezed == label
                 ? _value.label
                 : label // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            area: freezed == area
+                ? _value.area
+                : area // ignore: cast_nullable_to_non_nullable
                       as String?,
             createdAt: null == createdAt
                 ? _value.createdAt
@@ -123,6 +130,7 @@ abstract class _$$GenerationImplCopyWith<$Res>
     int order,
     bool isActive,
     String? label,
+    String? area,
     DateTime createdAt,
     List<ClearLog> clearLogs,
   });
@@ -146,6 +154,7 @@ class __$$GenerationImplCopyWithImpl<$Res>
     Object? order = null,
     Object? isActive = null,
     Object? label = freezed,
+    Object? area = freezed,
     Object? createdAt = null,
     Object? clearLogs = null,
   }) {
@@ -166,6 +175,10 @@ class __$$GenerationImplCopyWithImpl<$Res>
         label: freezed == label
             ? _value.label
             : label // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        area: freezed == area
+            ? _value.area
+            : area // ignore: cast_nullable_to_non_nullable
                   as String?,
         createdAt: null == createdAt
             ? _value.createdAt
@@ -188,6 +201,7 @@ class _$GenerationImpl implements _Generation {
     required this.order,
     required this.isActive,
     this.label,
+    this.area,
     required this.createdAt,
     final List<ClearLog> clearLogs = const [],
   }) : _clearLogs = clearLogs;
@@ -204,6 +218,8 @@ class _$GenerationImpl implements _Generation {
   @override
   final String? label;
   @override
+  final String? area;
+  @override
   final DateTime createdAt;
   final List<ClearLog> _clearLogs;
   @override
@@ -216,7 +232,7 @@ class _$GenerationImpl implements _Generation {
 
   @override
   String toString() {
-    return 'Generation(id: $id, order: $order, isActive: $isActive, label: $label, createdAt: $createdAt, clearLogs: $clearLogs)';
+    return 'Generation(id: $id, order: $order, isActive: $isActive, label: $label, area: $area, createdAt: $createdAt, clearLogs: $clearLogs)';
   }
 
   @override
@@ -229,6 +245,7 @@ class _$GenerationImpl implements _Generation {
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
             (identical(other.label, label) || other.label == label) &&
+            (identical(other.area, area) || other.area == area) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             const DeepCollectionEquality().equals(
@@ -245,6 +262,7 @@ class _$GenerationImpl implements _Generation {
     order,
     isActive,
     label,
+    area,
     createdAt,
     const DeepCollectionEquality().hash(_clearLogs),
   );
@@ -269,6 +287,7 @@ abstract class _Generation implements Generation {
     required final int order,
     required final bool isActive,
     final String? label,
+    final String? area,
     required final DateTime createdAt,
     final List<ClearLog> clearLogs,
   }) = _$GenerationImpl;
@@ -284,6 +303,8 @@ abstract class _Generation implements Generation {
   bool get isActive;
   @override
   String? get label;
+  @override
+  String? get area;
   @override
   DateTime get createdAt;
   @override
